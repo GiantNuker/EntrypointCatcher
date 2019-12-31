@@ -103,10 +103,18 @@ public class EntrypointCatcher {
                 if (container instanceof net.fabricmc.loader.ModContainer) {
                     net.fabricmc.loader.ModContainer mod = (net.fabricmc.loader.ModContainer) container;
                     for (EntrypointMetadata entrypoint : mod.getInfo().getEntrypoints("main")) {
-                        mainToMod.put(entrypoint.getValue(), container);
+                        String id = entrypoint.getValue();
+                        if (id.contains(":")) {
+                            id = id.substring(0, id.lastIndexOf(':'));
+                        }
+                        mainToMod.put(id, container);
                     }
                     for (EntrypointMetadata entrypoint : mod.getInfo().getEntrypoints("client")) {
-                        clientToMod.put(entrypoint.getValue(), container);
+                        String id = entrypoint.getValue();
+                        if (id.contains(":")) {
+                            id = id.substring(0, id.lastIndexOf(':'));
+                        }
+                        clientToMod.put(id, container);
                     }
                 }
             }
@@ -132,7 +140,7 @@ public class EntrypointCatcher {
             runPreEntrypointsCallbacks(entrypointKind);
             try {
                 EntrypointUtils.invoke(name, type, modInitializer -> {
-                    //TODO: this won't work when using method references or other fancy language adapter stuff
+                    //TODO: this won't work when using fancy language adapter stuff
                     String id = modInitializer.getClass().getName();
 
                     for (EntrypointHandler handler : entrypointHandlers) {
