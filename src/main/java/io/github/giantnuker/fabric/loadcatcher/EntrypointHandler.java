@@ -34,16 +34,18 @@ public interface EntrypointHandler {
 
     /**
      * Called before a mod is initialized
+     * @param id the identifier of the entrypoint, or what was passed in the JSON
      * @param mod Might be null in the case the initializer doesn't use a normal class reference for the initializer
      */
-    default void beforeModInitEntrypoint(@Nullable ModContainer mod, EntrypointKind entrypointKind) {
+    default void beforeModInitEntrypoint(String id, @Nullable ModContainer mod, EntrypointKind entrypointKind) {
     }
 
     /**
      * Called after a mod is initialized
+     * @param id the identifier of the entrypoint, or what was passed in the JSON
      * @param mod Might be null in the case the initializer doesn't use a normal class reference for the initializer
      */
-    default void afterModInitEntrypoint(@Nullable ModContainer mod, EntrypointKind entrypointKind) {
+    default void afterModInitEntrypoint(String id, @Nullable ModContainer mod, EntrypointKind entrypointKind) {
     }
 
     /**

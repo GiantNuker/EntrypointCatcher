@@ -136,23 +136,21 @@ public class EntrypointCatcher {
                     String id = modInitializer.getClass().getName();
 
                     for (EntrypointHandler handler : entrypointHandlers) {
-                        handler.beforeModInitEntrypoint(entrypointModGetter.get(id), entrypointKind);
+                        handler.beforeModInitEntrypoint(id, entrypointModGetter.get(id), entrypointKind);
                     }
                     try {
                         invoker.accept(modInitializer);
                     } catch (Throwable e) {
-                        if (handleInitializationError(e,
-                                        entrypointKind == EntrypointKind.CLIENT ? InitializationKind.CLIENT_ENTRYPOINT : InitializationKind.COMMON_ENTRYPOINT)) {
+                        if (handleInitializationError(e, entrypointKind == EntrypointKind.CLIENT ? InitializationKind.CLIENT_ENTRYPOINT : InitializationKind.COMMON_ENTRYPOINT)) {
                             throw e;
                         }
                     }
                     for (EntrypointHandler handler : entrypointHandlers) {
-                        handler.afterModInitEntrypoint(entrypointModGetter.get(id), entrypointKind);
+                        handler.afterModInitEntrypoint(id, entrypointModGetter.get(id), entrypointKind);
                     }
                 });
             } catch (Throwable e) {
-                if (handleInitializationError(e,
-                                entrypointKind == EntrypointKind.CLIENT ? InitializationKind.ALL_CLIENT_ENTRIES : InitializationKind.ALL_COMMON_ENTRIES)) {
+                if (handleInitializationError(e, entrypointKind == EntrypointKind.CLIENT ? InitializationKind.ALL_CLIENT_ENTRIES : InitializationKind.ALL_COMMON_ENTRIES)) {
                     throw e;
                 }
             }
