@@ -103,10 +103,18 @@ public class EntrypointCatcher {
                 if (container instanceof net.fabricmc.loader.ModContainer) {
                     net.fabricmc.loader.ModContainer mod = (net.fabricmc.loader.ModContainer) container;
                     for (EntrypointMetadata entrypoint : mod.getInfo().getEntrypoints("main")) {
-                        mainToMod.put(entrypoint.getValue(), container);
+                        String id = entrypoint.getValue();
+                        if (id.contains(":")) {
+                            id = id.substring(0, id.lastIndexOf(':'));
+                        }
+                        mainToMod.put(id, container);
                     }
                     for (EntrypointMetadata entrypoint : mod.getInfo().getEntrypoints("client")) {
-                        clientToMod.put(entrypoint.getValue(), container);
+                        String id = entrypoint.getValue();
+                        if (id.contains(":")) {
+                            id = id.substring(0, id.lastIndexOf(':'));
+                        }
+                        clientToMod.put(id, container);
                     }
                 }
             }
@@ -132,27 +140,25 @@ public class EntrypointCatcher {
             runPreEntrypointsCallbacks(entrypointKind);
             try {
                 EntrypointUtils.invoke(name, type, modInitializer -> {
-                    //TODO: this won't work when using method references or other fancy language adapter stuff
+                    //TODO: this won't work when using fancy language adapter stuff
                     String id = modInitializer.getClass().getName();
 
                     for (EntrypointHandler handler : entrypointHandlers) {
-                        handler.beforeModInitEntrypoint(entrypointModGetter.get(id), entrypointKind);
+                        handler.beforeModInitEntrypoint(id, entrypointModGetter.get(id), entrypointKind);
                     }
                     try {
                         invoker.accept(modInitializer);
                     } catch (Throwable e) {
-                        if (handleInitializationError(e,
-                                        entrypointKind == EntrypointKind.CLIENT ? InitializationKind.CLIENT_ENTRYPOINT : InitializationKind.COMMON_ENTRYPOINT)) {
+                        if (handleInitializationError(e, entrypointKind == EntrypointKind.CLIENT ? InitializationKind.CLIENT_ENTRYPOINT : InitializationKind.COMMON_ENTRYPOINT)) {
                             throw e;
                         }
                     }
                     for (EntrypointHandler handler : entrypointHandlers) {
-                        handler.afterModInitEntrypoint(entrypointModGetter.get(id), entrypointKind);
+                        handler.afterModInitEntrypoint(id, entrypointModGetter.get(id), entrypointKind);
                     }
                 });
             } catch (Throwable e) {
-                if (handleInitializationError(e,
-                                entrypointKind == EntrypointKind.CLIENT ? InitializationKind.ALL_CLIENT_ENTRIES : InitializationKind.ALL_COMMON_ENTRIES)) {
+                if (handleInitializationError(e, entrypointKind == EntrypointKind.CLIENT ? InitializationKind.ALL_CLIENT_ENTRIES : InitializationKind.ALL_COMMON_ENTRIES)) {
                     throw e;
                 }
             }
