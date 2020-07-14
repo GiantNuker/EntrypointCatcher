@@ -173,7 +173,7 @@ public class EntrypointCatcher {
 
         private static void instantiateMods(File newRunDir, Object gameInstance) {
             try {
-                net.fabricmc.loader.FabricLoader.INSTANCE.prepareModInit(newRunDir, gameInstance);
+                net.fabricmc.loader.FabricLoader.INSTANCE.prepareModInit(newRunDir.toPath(), gameInstance);
             } catch (Throwable e) {
                 if (handleInitializationError(e, InitializationKind.INSTANTIATION)) throw e;
             }
